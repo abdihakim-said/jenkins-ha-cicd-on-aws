@@ -58,19 +58,45 @@ While GitHub Actions and GitLab CI are great tools, I chose **self-hosted Jenkin
 
 - ✅ Full **infrastructure control** for compliance-heavy environments and **customizability**
 - ✅ - Greater **plugin ecosystem** and compatibility with legacy integrations
-- ✅ - **Blue-Green upgrade support** for zero-downtime
+- ✅ - Native support for **Blue-Green upgrade strategies** to achieve zero-downtime
 - ✅ - High availability with **Elastic Load Balancer** and **Auto Scaling**
-- ✅ - **Centralized, scalable CI/CD** across multiple teams
+- ✅ - **Centralized, scalable CI** across multiple teams
+
+  This setup gave the client a **centralized, secure, and team-friendly CI platform** that could scale with demand and evolve with minimal vendor lock-in.
+
+---
+## 🧠 Why EC2 Over EKS?
+
+As the lead DevOps consultant, I recommended EC2 over EKS for several key reasons:
+
+### ✅ Business Constraints & Budget
+- EKS introduces **control plane and per-service costs**, plus additional complexity.
+- EC2 with Auto Scaling and EFS offered **predictable, lower cost**, and simplified management.
+
+### ✅ Internal Team Skillset
+- The client’s team had **no Kubernetes experience**.
+- EC2 allowed them to leverage their existing knowledge in Linux, EC2, and Jenkins.
+
+### ✅ Simplicity and Stability for Jenkins Master
+- Jenkins master is a **stateful workload**.
+- EC2 + EFS provided **straightforward backups, persistence, and auditability** without dealing with PVCs, StatefulSets, or persistent volume issues.
+
+### ✅ Simpler HA and Upgrades
+- **Blue-green upgrades** with ELB + Packer AMIs were easier to build and roll back compared to Kubernetes-based Jenkins master deployments.
+
+### ✅ Fit for Purpose
+- The goal wasn’t containerization, but a **stable, secure, and scalable CI/CD platform**.
+- EC2 delivered more value faster and kept long-term maintenance simple for the client.
 
 ---
 
 ## 🛠️ Technical Implementation (End-to-End by Me)
 
-### 1️⃣ Image Creation with Packer
+#### 1️⃣ Image Creation – **Packer**
 - Built secure, pre-configured Jenkins master AMIs
 - Automated **plugin installation**, OS hardening, and security updates
 - Integrated **vulnerability scanning** during image builds
-- Quarterly image refresh strategy
+- automated quarterly image refresh strategy
 
 ### 2️⃣ Infrastructure Provisioning with Terraform
 - Deployed **multi-AZ architecture**
@@ -79,18 +105,19 @@ While GitHub Actions and GitLab CI are great tools, I chose **self-hosted Jenkin
 - Provisioned Elastic Load Balancer for traffic routing
 - Provisioned Network setup (VPC, subnets, security groups)
 - Terraform state stored securely in S3 with DynamoDB locking
+- Modular and reusable codebase
 
 ### 3️⃣ Jenkins Configuration (Ansible)
 - Configured Jenkins securely: RBAC, CSRF, plugin setup, CLI lockdown
 - Used **Ansible roles** for idempotent and repeatable config
 
 ### 4️⃣ Deployment Strategy: Blue-Green
-- Deployed secondary Jenkins master
+- Deployed new Jenkins master instances in parallel
 - Verified health checks before traffic switch using **ELB target groups**
-- Ensured **zero-downtime** upgrades and instant rollback
+- Ensured **zero-downtime** upgrades and instant rollback with minimal user impact
 
 ### 5️⃣ Monitoring and Observability
-- Configured **Prometheus exporters** on Jenkins nodes
+- Configured **Prometheus exporters** on Jenkins nodes to export Jenkins metrics
 - Built **Grafana dashboards** for visibility on jobs, queues, agents
 - Logs pushed to **CloudWatch** with alerting
 
@@ -121,10 +148,12 @@ While GitHub Actions and GitLab CI are great tools, I chose **self-hosted Jenkin
 ### 💼 Business Value
 
 - **99.9% availability** of Jenkins CI/CD services
-- **Zero-downtime upgrades**, enabling uninterrupted developer workflows
+- **Zero-downtime upgrades**, enabling uninterrupted developer workflows(improving developer experience)
 - **40% reduction in operational overhead** through full automation
 - **Faster development cycles**, leading to improved time-to-market
 - A **repeatable and scalable platform** for future clients or internal teams
+- A **secure, scalable, and repeatable CI foundation**
+
 
 ### 🔧 Technical Achievements
 
