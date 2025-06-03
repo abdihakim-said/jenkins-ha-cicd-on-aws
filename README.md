@@ -7,6 +7,7 @@ This project delivers a **secure, scalable, and highly available Jenkins CI/CD p
 > ✅ I was solely responsible for designing, building, automating, and securing the entire infrastructure from the ground up — aligning technical excellence with business goals.
 
 ---
+<img width="737" alt="Screenshot 2025-06-03 at 01 24 44" src="https://github.com/user-attachments/assets/fccf7d35-68ec-4dc0-a3c5-a4dfd9864179" />
 
 
 ## 🧩 Business Scenario
