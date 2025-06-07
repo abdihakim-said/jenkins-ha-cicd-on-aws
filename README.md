@@ -235,6 +235,7 @@ I was solely responsible for designing, implementing, securing, and automating t
   - Transition to Glacier if needed for cold storage
 
 ---
+<img width="756" alt="Screenshot 2025-06-07 at 13 06 48" src="https://github.com/user-attachments/assets/0cd02bda-4048-4f9c-80a6-7bd88b564a62" />
 
 ### 7️⃣ CI/CD Orchestration – **Jenkins Pipelines**
 - Automated Blue-Green deployments and AMI refresh via Jenkinsfiles
