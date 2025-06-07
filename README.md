@@ -271,12 +271,54 @@ I was solely responsible for designing, implementing, securing, and automating t
 
 ## 🔄 CI/CD Workflow
 
+This workflow represents the complete lifecycle of provisioning, configuring, upgrading, and maintaining the Jenkins High Availability infrastructure — fully automated and repeatable.
+
 ```text
-1. Build secure Jenkins AMI with Packer
-2. Deploy infrastructure using Terraform
-3. Configure Jenkins with Ansible
-4. Automate upgrades with blue-green strategy
-5. Monitor with Prometheus, Grafana, CloudWatch
+1. 🏗️ Build Secure Jenkins AMI
+   - Triggered via Jenkins or GitHub commit
+   - Packer pulls base image, installs Jenkins, applies hardening
+   - Plugins pre-installed, Trivy scans image
+   - Outputs version-tagged AMI
+
+2. 🌐 Provision Infrastructure (Terraform)
+   - Terraform deploys:
+     - EC2 instances (Jenkins master & agents)
+     - EFS volume
+     - VPC, subnets, route tables
+     - Auto Scaling Group & ELB for Blue/Green
+   - State managed securely in S3 with DynamoDB locking
+
+3. ⚙️ Configure Jenkins (Ansible)
+   - Ansible connects to new EC2 instance
+   - Applies:
+     - Jenkins security (RBAC, CSRF protection)
+     - Plugin config
+     - CLI lockdown
+   - Ensures idempotent, production-ready setup
+
+4. 🔁 Blue-Green Upgrade Strategy
+   - New “Green” Jenkins instance launched using fresh AMI
+   - Mounts shared EFS for job history and configs
+   - Sanity checks via ELB health targets
+   - ELB traffic switched from “Blue” to “Green”
+   - “Blue” remains on standby for rollback
+
+5. 🔍 Monitoring & Observability
+   - Prometheus scrapes metrics via Jenkins exporter
+   - Grafana dashboards auto-refresh CI insights
+   - CloudWatch captures logs and sends alerts
+
+6. 💾 Daily Backups
+   - Bash cron job creates `.tar.gz` of Jenkins home
+   - Uploads to encrypted S3 bucket
+   - S3 lifecycle policy retains 30 days, deletes after 90
+   - Versioning enabled for rollback
+
+7. 📈 CI/CD Control via Jenkins Pipelines
+   - Infrastructure and image updates fully orchestrated via Jenkinsfiles
+   - Supports multi-environment workflows (Dev, QA, Prod)
+   - All updates pass through review + scan before deployment
+
 
 ## ✅ Project Outcomes
 
