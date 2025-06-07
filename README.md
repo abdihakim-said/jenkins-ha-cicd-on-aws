@@ -57,6 +57,8 @@ To resolve these pain points, I was tasked to deliver a Jenkins infrastructure t
 
 ---
 ## 🔁 Deployment Strategy: Blue-Green
+<img width="889" alt="Screenshot 2025-06-07 at 13 08 15" src="https://github.com/user-attachments/assets/449ecbe6-fe44-47ec-acea-abd35fecb18b" />
+
 
 To enable **zero-downtime upgrades**, I implemented a Blue-Green deployment strategy:
 
