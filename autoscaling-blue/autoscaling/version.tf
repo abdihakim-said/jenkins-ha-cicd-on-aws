@@ -1,7 +1,7 @@
 
 #---------------------------------------------#
-# Author: Adam WezvaTechnologies
-# Call/Whatsapp: +91-9739110917
+# Author: Abdihakim Said
+
 #---------------------------------------------#
 
 # Terraform version
@@ -17,6 +17,6 @@ terraform {
 }
 
 #---------------------------------------------#
-# Author: Adam WezvaTechnologies
-# Call/Whatsapp: +91-9739110917
+# Author: Abdihakim Said
+
 #---------------------------------------------#
