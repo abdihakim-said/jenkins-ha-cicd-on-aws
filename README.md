@@ -1,8 +1,10 @@
-# 🚀 Jenkins High Availability CI Infrastructure Solution
+# 🚀 Jenkins High Availability CI Infrastructure Solution – AWS Based
 
-## 📘 Overview
+## 📘 Project Overview
 
-This project delivers a **secure, scalable, and highly available Jenkins CI/CD platform** built entirely on AWS, designed with full automation, enterprise-grade security, and production-level reliability.
+As a **DevOps Consultant at Luul Solutions**, I was engaged by a client to deliver a **highly available, secure, and fully automated Jenkins CI/CD platform on AWS**. The client's infrastructure relied on EC2-based deployments with no containerization, making it critical to build a scalable CI system that supports legacy workloads without compromising modern DevSecOps practices.
+
+
 
 ✅ I was solely responsible for designing, building, automating, and securing the entire infrastructure — aligning DevOps best practices with business objectives.
 
@@ -15,63 +17,89 @@ This project delivers a **secure, scalable, and highly available Jenkins CI/CD p
 
 A mid-sized technology consulting firm faced critical challenges with their CI platform:
 
-- Jenkins master instability and **frequent downtime during upgrades**
-- Manual, **time-consuming infrastructure management**
-- **Manual deployments** Inconsistent configurations across environments
-- **Scalability issues** as team sizes and workloads grew
-- Increased **operational overhead** for DevOps teams and slow release cycles
-- Lack of **security best practices and compliance enforcement**
+- ❌ Frequent Jenkins downtime during upgrades
+- ❌ No consistent configuration between environments
+- ❌ Manual image creation and patching
+- ❌ No disaster recovery or rollback mechanism
+- ❌ Zero observability or alerting
+- ❌ No backup strategy for Jenkins job data
+
 
 ---
 
 ## ❗ Objectives
 
-To resolve these pain points, I was tasked to deliver a Jenkins infrastructure that is:
+I was responsible for delivering an infrastructure that is:
 
-- ✅ **Highly available** across Availability Zones(multi-AZ)
-- ✅ **Zero-downtime upgrade capable with rollback protection**
-- ✅ **Fully automated** from image to deployment using Infrastructure as Code
-- ✅ Compliant with security standards (IAM, encryption, backups)
-- ✅ **Scalable** Scales automatically based on workload with auto-healing jenkins agents and dynamic agent provisioning
-- ✅ Observable and easy to maintain by internal DevOps teams
+
+- ✅ Highly available across multiple AZs using **Auto Scaling Groups**
+- ✅ Zero-downtime upgrade-capable using **Blue-Green strategy**
+- ✅ Built using **modular, reusable Infrastructure as Code**
+- ✅ Secure with vulnerability scanning, IAM hardening, and encrypted storage
+- ✅ Scalable with dynamic agent provisioning and automated image updates
+- ✅ Fully monitored, observable, and auditable
+- ✅ Disaster recovery–ready with S3 backups and rollback-safe AMIs
 
 
 ---
 
 ## 🏗️ Solution Architecture
 
-### 🔧 Key Components
-
-| Tool / Service       | Purpose                                                   |
-|----------------------|-----------------------------------------------------------|
-| AWS (EC2, EFS, ELB)  | Compute, storage, HA routing                              |
-| Auto Scaling Groups  | Dynamic Jenkins agent provisioning                        |
-| Terraform            | Infrastructure provisioning (modular and reusable)        |
-| Packer               | Golden AMI builds with secure Jenkins installation         |
-| Ansible              | Jenkins configuration, security hardening                 |
-| Jenkins (HA)         | Core CI/CD tool, running in a Blue-Green setup            |
-| Bash / Shell         | Custom automation and backup scripts                      |
-| Prometheus & Grafana | Monitoring and visualization                              |
-| CloudWatch           | Logging and alerting                                      |
-| S3 + Lifecycle Policy| Daily backups of Jenkins data with versioning and cleanup |
+| Tool / Service       | Purpose                                                    |
+|----------------------|------------------------------------------------------------|
+| AWS (EC2, EFS, ELB)  | Core infrastructure, storage, high availability routing     |
+| Auto Scaling Groups  | High availability and self-healing for Jenkins agents       |
+| Terraform            | Infrastructure provisioning (modular + reusable)            |
+| Packer               | Golden AMI creation with Jenkins pre-installed              |
+| Ansible              | Configuration of Jenkins master + hardening                 |
+| Jenkins              | Core CI/CD tool, orchestrating the Golden Image pipeline    |
+| Trivy                | Vulnerability scanning of AMIs                              |
+| Bash / Shell         | Backup and automation scripts                               |
+| Prometheus + Grafana | CI metrics, agent health, alerting dashboards               |
+| S3 + Lifecycle       | Encrypted backups, versioning, and retention policies       |
 
 ---
-## 🔁 Deployment Strategy: Blue-Green
+## 🔄 Blue-Green Deployment Strategy
+
+
 <img width="889" alt="Screenshot 2025-06-07 at 13 08 15" src="https://github.com/user-attachments/assets/449ecbe6-fe44-47ec-acea-abd35fecb18b" />
 
+# To avoid downtime during upgrades:
 
-To enable **zero-downtime upgrades**, I implemented a Blue-Green deployment strategy:
+1. 🔧 Jenkins "Green" AMI is created and deployed in a new ASG
+2. 🧪 Health checks run via ELB
+3. 🔁 ELB traffic switches from "Blue" to "Green"
+4. 🔙 "Blue" is retained temporarily for rollback
+5. 🔄 Result: **Zero downtime** during Jenkins upgrades or patching
 
-1. Deploy new Jenkins instance (Green) using new AMI.
-2. Mount existing **EFS volume** to ensure persistent Jenkins data.
-3. Verify new instance with health checks and smoke tests.
-4. Switch ELB traffic from Blue → Green.
-5. Keep Blue as a fallback instance in case rollback is needed.
-
+---
 This method supports:
 - 🔄 Jenkins version upgrades
 - 💡 Instance type changes
 - 💥 Instant rollback without disruption
+
+---
+
+
+## 🔍 Monitoring & Backup Strategy
+
+### Monitoring
+
+- Jenkins metrics exported via **Prometheus Jenkins Exporter**
+- Dashboards built in **Grafana**:
+  - Build failures, agent load, job durations
+- Alerting via **AWS CloudWatch** and Prometheus rules
+
+### Backups
+
+- Custom **cron job** runs on Jenkins master
+- Archives `/var/lib/jenkins` into `.tar.gz`
+- Uploads to **S3** with:
+  - ✅ Versioning enabled
+  - ✅ Server-side encryption (SSE)
+  - ✅ Lifecycle rule:
+    - Retain last 30 days
+    - Auto-delete after 90 days
 
 ---
 
@@ -112,49 +140,6 @@ As the lead DevOps consultant, I recommended EC2 over EKS for several key reason
 - The goal wasn’t containerization, but a **stable, secure, and scalable CI/CD platform**.
 - EC2 delivered more value faster and kept long-term maintenance simple for the client.
 
----
-# 🔐 Monitoring & Backup Strategy – Jenkins HA CI/CD on AWS
-
-This section outlines the observability and disaster recovery approach used in a highly available Jenkins infrastructure setup on AWS.
-
----
-
-## 🔍 Monitoring Strategy
-
-**Prometheus + Grafana Integration**
-
-- Prometheus Jenkins exporter configured to expose:
-  - Job duration & status
-  - Queue length
-  - Executor availability
-  - Agent/node health
-
-- Grafana dashboards for:
-  - Build trends
-  - Failed jobs over time
-  - Agent load and saturation
-  - CI performance metrics
-
-- Alerting integrated via CloudWatch and Prometheus rules for high failure rates and build queue spikes
-
----
-
-## 💾 Backup Strategy
-
-**Automated Daily Backups with S3**
-
-- Jenkins Home (`/var/lib/jenkins`) is backed up daily using a custom Bash script
-- Script runs on a cron job and:
-  - Creates a `.tar.gz` archive of Jenkins config and job data
-  - Uploads to **S3 bucket** with encryption enabled
-  - Tags backup with timestamp and instance version
-
-**S3 Lifecycle Policies:**
-
-- **Versioning enabled**: Allows point-in-time recovery
-- **Lifecycle rules**:
-  - Retain recent 30 days of backups
-  - Automatically delete older versions after 90 days
 
 ---
 
@@ -164,48 +149,55 @@ I was solely responsible for designing, implementing, securing, and automating t
 
 ---
 
-### 1️⃣ Image Creation – **Packer**
-- Built secure, hardened Jenkins master **Golden AMIs**
-- Automated:
-  - Plugin installation
-  - System hardening
-  - Jenkins setup
-- Embedded **security scanning** using Trivy during AMI builds
-- Quarterly AMI refreshes for patching and version updates
-- AMI version tagging and change log management for auditability
+### 1️⃣ Golden AMI Pipeline – Packer + Jenkins + Ansible
 
----
+- Terraform retrieves EFS ID
+- Packer builds AMI with:
+  - Jenkins, Java, NFS utils, and Jenkins data mount
+  - Ansible roles for Jenkins setup and OS patching
+- Trivy scans AMI for vulnerabilities
+- AMI is tagged and stored in AWS for use in Launch Templates
 
 ### 2️⃣ Infrastructure Provisioning – **Terraform**
 - Provisioned complete infrastructure in **multi-AZ architecture**
-- Created:
-  - EC2 instances (Jenkins Master, Agents)
-  - Auto Scaling Groups for dynamic Jenkins agents
-  - Elastic File System (EFS) for Jenkins persistent data
-  - Elastic Load Balancer (ALB) with **Blue-Green** support
-  - VPC, subnets, internet/NAT gateways, and route tables
+- Creates:
+  - VPC, subnets, NAT gateways, routing
+  - EFS for persistent Jenkins storage
+  - ALB with HTTPS support
+  - Auto Scaling Group and Launch Template
+  - VPC Endpoints to access S3 securely (no public internet)
+  - S3 bucket with backup lifecycle policies
 - Used **remote state backend** in S3 + DynamoDB locking
 - Infrastructure coded in **modular, reusable Terraform modules**
 
 ---
 
-### 3️⃣ Jenkins Configuration – **Ansible**
-- Configured Jenkins master with:
-  - Secure CLI lockdown
-  - Role-based access control (RBAC)
-  - CSRF protection and plugin installation
+### 3️⃣ Jenkins Configuration – Ansible
+
+- Installs Jenkins
+- Configures RBAC, CSRF protection, secure CLI
+- Installs essential plugins
+- Locks down Jenkins Master using hardened roles
 - Built **idempotent Ansible roles** to ensure repeatable configurations across all environments (Dev/QA/Prod)
 
 ---
 
-### 4️⃣ Deployment Strategy – **Blue-Green Deployment**
-- Deployed new Jenkins AMI (Green) parallel to live (Blue)
-- Mounted shared **EFS** to preserve job history and plugin state
-- Performed smoke tests and health checks via ELB before switch
-- Seamlessly routed traffic to Green using **ELB Target Groups**
-- Kept Blue online temporarily for **rollback safety**
+### 4️⃣ High Availability
+
+- Jenkins master is deployed in **ASG**
+- **EFS** ensures all master instances access the same data
+- **ALB** routes traffic based on health checks
+- If master fails, ASG launches a new instance from Golden AMI
 
 ---
+
+### 5️⃣ CI/CD Orchestration – Jenkins Pipelines
+
+- AMI build and upgrade pipeline runs via Jenkins
+- Git triggers Packer + Terraform workflows
+- All commits pass through review, scan, and testing stages
+- Environments supported: **Dev, QA, Prod**
+
 
 ### 5️⃣ Monitoring & Observability – **Prometheus + Grafana + CloudWatch**
 - Configured **Prometheus Jenkins Exporter** for CI metrics:
@@ -266,63 +258,13 @@ I was solely responsible for designing, implementing, securing, and automating t
 | Challenge                       | Solution                                                            |
 |--------------------------------|---------------------------------------------------------------------|
 | Downtime during upgrades       | Implemented blue-green deployment with ELB switching                |
-| Inconsistent configurations    | Ansible roles for repeatable config across environments             |
+| Inconsistent configurations    | Ansible roles for repeatable config across environments  
+| Manual patching and backup     | Jenkinsfile + cron job + S3 automated retention                     |
 | Security and compliance gaps   | Packer image scanning, IAM least privilege, encrypted EFS           |
 | Manual effort and overhead     | Full automation via Terraform, Packer, Ansible, and CI scripts      |
-| Limited monitoring & insight      | Prometheus + Grafana dashboards + CloudWatch logs & alerts       |
+| Lack of observability          | Prometheus + Grafana dashboards + CloudWatch logs & alerts          |
 
 ---
-
-## 🔄 CI/CD Workflow
-
-This workflow represents the complete lifecycle of provisioning, configuring, upgrading, and maintaining the Jenkins High Availability infrastructure — fully automated and repeatable.
-
-```text
-1. 🏗️ Build Secure Jenkins AMI
-   - Triggered via Jenkins or GitHub commit
-   - Packer pulls base image, installs Jenkins, applies hardening
-   - Plugins pre-installed, Trivy scans image
-   - Outputs version-tagged AMI
-
-2. 🌐 Provision Infrastructure (Terraform)
-   - Terraform deploys:
-     - EC2 instances (Jenkins master & agents)
-     - EFS volume
-     - VPC, subnets, route tables
-     - Auto Scaling Group & ELB for Blue/Green
-   - State managed securely in S3 with DynamoDB locking
-
-3. ⚙️ Configure Jenkins (Ansible)
-   - Ansible connects to new EC2 instance
-   - Applies:
-     - Jenkins security (RBAC, CSRF protection)
-     - Plugin config
-     - CLI lockdown
-   - Ensures idempotent, production-ready setup
-
-4. 🔁 Blue-Green Upgrade Strategy
-   - New “Green” Jenkins instance launched using fresh AMI
-   - Mounts shared EFS for job history and configs
-   - Sanity checks via ELB health targets
-   - ELB traffic switched from “Blue” to “Green”
-   - “Blue” remains on standby for rollback
-
-5. 🔍 Monitoring & Observability
-   - Prometheus scrapes metrics via Jenkins exporter
-   - Grafana dashboards auto-refresh CI insights
-   - CloudWatch captures logs and sends alerts
-
-6. 💾 Daily Backups
-   - Bash cron job creates `.tar.gz` of Jenkins home
-   - Uploads to encrypted S3 bucket
-   - S3 lifecycle policy retains 30 days, deletes after 90
-   - Versioning enabled for rollback
-
-7. 📈 CI/CD Control via Jenkins Pipelines
-   - Infrastructure and image updates fully orchestrated via Jenkinsfiles
-   - Supports multi-environment workflows (Dev, QA, Prod)
-   - All updates pass through review + scan before deployment
-
 
 ## ✅ Project Outcomes
 
@@ -341,9 +283,9 @@ This workflow represents the complete lifecycle of provisioning, configuring, up
 - 🔁 **Fully automated infrastructure lifecycle** from image to deployment
 - 🧱 Built **modular and reusable Terraform + Ansible roles**
 - 🔐 **Security-first architecture** (RBAC, IAM, encrypted EFS, backup versioning)
-- 🚀 Scalable design using **Auto Scaling Groups** and ELB-based routing
+- 🚀 Scalable design using **Auto Scaling Groups** and ELB-based routing, 
 - 🔍 Observability built in from day one with **Prometheus and Grafana**
-- ♻️ **Rollback strategy** with version-controlled Jenkins AMIs and Blue-Green logic
+- ♻️ **Rollback strategy** with version-controlled Jenkins AMIs for Seamless rollback strategy and Blue-Green logic
 
 
 ---
@@ -357,24 +299,44 @@ This workflow represents the complete lifecycle of provisioning, configuring, up
 | Image Automation   | Packer                                                    |
 | Config Management  | Ansible                                                   |
 | CI/CD Engine       | Jenkins (HA + Blue-Green setup)                           |
-| Monitoring         | Prometheus, Grafana, AWS CloudWatch                       |
-| Backup             | S3 (versioning + lifecycle policies), Shell scripts       |
+| Observability      | Prometheus, Grafana, AWS CloudWatch   
+| Security           | Trivy, IAM Least Privilege, SSE, VPC Endpoints            |
+| Backup             | S3 (versioning + lifecycle policies), Bash cron scripts   |
 | Automation         | Bash / Shell                                              |
 
 ---
+---
 
-## 🧪 Getting Started
+## 📋 Getting Started
 
-### 📋 Prerequisites
+### Requirements
 
-Before deploying, ensure you have the following:
-
-- An AWS account with CLI credentials configured
-- Installed locally:
-  - [Terraform](https://developer.hashicorp.com/terraform/downloads)
-  - [Packer](https://developer.hashicorp.com/packer/downloads)
-  - [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/index.html)
-  - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+- AWS account + IAM access
+- Jenkins Agent with:
+  - Terraform
+  - Packer
+  - Ansible
+  - AWS CLI
+  - Trivy
 
 ---
 
+## 👨‍💻 Author
+
+**Abdihakim Said**  
+DevOps & Multi-Cloud Engineer  
+💼 Project completed as part of my consulting role at **Luul Solutions**  
+📧 abdihakimsaid1@gmail.com  
+🔗 [linkedin.com/in/said-devops](https://linkedin.com/in/said-devops)  
+🔗 [github.com/abdihakim-said](https://github.com/abdihakim-said)
+
+---
+
+## 📄 License
+
+MIT License
+
+---
+
+> Want to explore or fork the project?  
+> 🔗 [GitHub Repository – jenkins-ha-cicd-on-aws](https://github.com/abdihakim-said/jenkins-ha-cicd-on-aws)
