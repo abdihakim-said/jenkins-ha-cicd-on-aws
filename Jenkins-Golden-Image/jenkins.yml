@@ -1,0 +1,18 @@
+#---------------------------------------------#
+# Author: Abdihakim Said
+#---------------------------------------------#
+
+---
+- name: Install Jenkins
+  hosts: localhost
+  become: yes
+  vars:
+   reboot_ok: false
+   ami_setup: true
+  roles:
+    - { role: master, when: ami_setup }
+    - ospatch
+
+#---------------------------------------------#
+# Author: Abdihakim Said
+#---------------------------------------------#
