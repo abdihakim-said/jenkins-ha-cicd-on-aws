@@ -1,7 +1,6 @@
 
 #---------------------------------------------#
-# Author: Adam WezvaTechnologies
-# Call/Whatsapp: +91-9739110917
+# Author: Abdihakim said
 #---------------------------------------------#
 provider "aws" {
   region = "ap-south-1"
@@ -44,7 +43,6 @@ module "elb" {
 }
 
 #---------------------------------------------#
-# Author: Adam WezvaTechnologies
-# Call/Whatsapp: +91-9739110917
+# Author: Abdihakim Said
 #---------------------------------------------#
 
