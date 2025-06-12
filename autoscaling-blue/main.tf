@@ -1,7 +1,7 @@
 
 #---------------------------------------------#
-# Author: Adam WezvaTechnologies
-# Call/Whatsapp: +91-9739110917
+# Author: Abdihakim Said
+
 #---------------------------------------------#
 
 provider "aws" {
@@ -28,6 +28,6 @@ module "autoscaling" {
 }
 
 #---------------------------------------------#
-# Author: Adam WezvaTechnologies
-# Call/Whatsapp: +91-9739110917
+# Author: Abdihakim Said
+
 #---------------------------------------------#
