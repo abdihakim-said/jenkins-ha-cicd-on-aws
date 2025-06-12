@@ -1,7 +1,6 @@
 
 #---------------------------------------------#
-# Author: Adam WezvaTechnologies
-# Call/Whatsapp: +91-9739110917
+# Author: Abdihakim Said
 #---------------------------------------------#
 
 provider "aws" {
@@ -32,6 +31,5 @@ resource "aws_efs_mount_target" "example" {
 }
 
 #---------------------------------------------#
-# Author: Adam WezvaTechnologies
-# Call/Whatsapp: +91-9739110917
+# Author: Abdihakim Said
 #---------------------------------------------#
