@@ -1,8 +1,7 @@
 #!/bin/bash
 
 #---------------------------------------------#
-# Author: Adam WezvaTechnologies
-# Call/Whatsapp: +91-9739110917
+# Author: Abdihakim Said
 #---------------------------------------------#
 
 
@@ -116,6 +115,5 @@ backup_jobs() {
   exit 0
 
 #---------------------------------------------#
-# Author: Adam WezvaTechnologies
-# Call/Whatsapp: +91-9739110917
+# Author: Abdihakim Said
 #---------------------------------------------#
