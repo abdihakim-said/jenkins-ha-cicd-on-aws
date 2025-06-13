@@ -1,6 +1,5 @@
 #---------------------------------------------#
-# Author: Adam WezvaTechnologies
-# Call/Whatsapp: +91-9739110917
+# Author: Abdihakim Said
 #---------------------------------------------#
 
 - name: ensure the jenkins apt repository key is installed
@@ -81,6 +80,5 @@
   when: port_check.failed == true
 
 #---------------------------------------------#
-# Author: Adam WezvaTechnologies
-# Call/Whatsapp: +91-9739110917
+# Author: Abdihakim Said
 #---------------------------------------------#
